@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +9,12 @@ class Medicine {
   double price;
   int quantity;
 
-  Medicine({required this.id, required this.name, required this.price, required this.quantity});
+  Medicine({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.quantity,
+  });
 }
 
 class BillItem {
@@ -56,11 +60,16 @@ class BillProvider with ChangeNotifier {
   List<BillItem> get billItems => [..._billItems];
 
   double get totalAmount {
-    return _billItems.fold(0.0, (sum, item) => sum + (item.medicine.price * item.quantity));
+    return _billItems.fold(
+      0.0,
+      (sum, item) => sum + (item.medicine.price * item.quantity),
+    );
   }
 
   void addToBill(Medicine medicine, int quantity) {
-    final existingIndex = _billItems.indexWhere((item) => item.medicine.id == medicine.id);
+    final existingIndex = _billItems.indexWhere(
+      (item) => item.medicine.id == medicine.id,
+    );
     if (existingIndex != -1) {
       _billItems[existingIndex].quantity += quantity;
     } else {
@@ -73,7 +82,7 @@ class BillProvider with ChangeNotifier {
     _billItems.removeWhere((item) => item.medicine.id == medicineId);
     notifyListeners();
   }
-  
+
   void clearBill() {
     _billItems.clear();
     notifyListeners();
@@ -86,13 +95,16 @@ class ThemeProvider with ChangeNotifier {
   ThemeMode get themeMode => _themeMode;
 
   void toggleTheme() {
-    _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    _themeMode = _themeMode == ThemeMode.light
+        ? ThemeMode.dark
+        : ThemeMode.light;
     notifyListeners();
   }
 }
 
 // --- Main Application ---
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
@@ -110,10 +122,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color primarySeedColor = Colors.teal;
+    const MaterialColor primarySeedColor = Colors.teal;
 
     final appTextTheme = TextTheme(
-      displayLarge: GoogleFonts.oswald(fontSize: 57, fontWeight: FontWeight.bold),
+      displayLarge: GoogleFonts.oswald(
+        fontSize: 57,
+        fontWeight: FontWeight.bold,
+      ),
       titleLarge: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.w500),
       bodyMedium: GoogleFonts.openSans(fontSize: 14),
       labelLarge: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500),
@@ -129,7 +144,10 @@ class MyApp extends StatelessWidget {
       appBarTheme: AppBarTheme(
         backgroundColor: primarySeedColor,
         foregroundColor: Colors.white,
-        titleTextStyle: GoogleFonts.oswald(fontSize: 24, fontWeight: FontWeight.bold),
+        titleTextStyle: GoogleFonts.oswald(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -137,7 +155,10 @@ class MyApp extends StatelessWidget {
           backgroundColor: primarySeedColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500),
+          textStyle: GoogleFonts.roboto(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
@@ -152,15 +173,21 @@ class MyApp extends StatelessWidget {
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.grey[900],
         foregroundColor: Colors.white,
-        titleTextStyle: GoogleFonts.oswald(fontSize: 24, fontWeight: FontWeight.bold),
+        titleTextStyle: GoogleFonts.oswald(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.black,
-          backgroundColor: Colors.teal[200],
+          backgroundColor: primarySeedColor.shade200,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: GoogleFonts.roboto(fontSize: 16, fontWeight: FontWeight.w500),
+          textStyle: GoogleFonts.roboto(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
@@ -195,6 +222,11 @@ class _HomeScreenState extends State<HomeScreen> {
     InventoryScreen(),
   ];
 
+  static const List<String> _titles = <String>[
+    'Medicine Billing',
+    'Inventory',
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -207,18 +239,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Medicine Billing'),
+        title: Text(_titles[_selectedIndex]),
         actions: [
           IconButton(
-            icon: Icon(themeProvider.themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
+            icon: Icon(
+              themeProvider.themeMode == ThemeMode.dark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+            ),
             onPressed: () => themeProvider.toggleTheme(),
             tooltip: 'Toggle Theme',
           ),
         ],
       ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -256,24 +290,43 @@ class _BillingScreenState extends State<BillingScreen> {
         children: [
           Expanded(
             child: billProvider.billItems.isEmpty
-                ? const Center(child: Text('No items in the bill. Add some from the inventory!'))
+                ? const Center(
+                    child: Text(
+                      'No items in the bill. Add some from the inventory!',
+                    ),
+                  )
                 : ListView.builder(
                     itemCount: billProvider.billItems.length,
                     itemBuilder: (context, index) {
                       final item = billProvider.billItems[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         child: ListTile(
                           leading: CircleAvatar(
                             child: Text((index + 1).toString()),
                           ),
-                          title: Text(item.medicine.name, style: Theme.of(context).textTheme.titleMedium),
-                          subtitle: Text('Qty: ${item.quantity} @ \$${item.medicine.price.toStringAsFixed(2)}'),
-                          trailing: Text('\$${(item.medicine.price * item.quantity).toStringAsFixed(2)}', style: Theme.of(context).textTheme.titleMedium),
+                          title: Text(
+                            item.medicine.name,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          subtitle: Text(
+                            'Qty: ${item.quantity} @ \$${item.medicine.price.toStringAsFixed(2)}',
+                          ),
+                          trailing: Text(
+                            '\$${(item.medicine.price * item.quantity).toStringAsFixed(2)}',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                           onLongPress: () {
                             billProvider.removeFromBill(item.medicine.id);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('${item.medicine.name} removed from bill.')),
+                              SnackBar(
+                                content: Text(
+                                  '${item.medicine.name} removed from bill.',
+                                ),
+                              ),
                             );
                           },
                         ),
@@ -289,32 +342,50 @@ class _BillingScreenState extends State<BillingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Total Amount:', style: Theme.of(context).textTheme.titleLarge),
-                    Text('\$${billProvider.totalAmount.toStringAsFixed(2)}', style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Theme.of(context).colorScheme.primary)),
+                    Text(
+                      'Total Amount:',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    Text(
+                      '\$${billProvider.totalAmount.toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             child: ElevatedButton.icon(
-              onPressed: billProvider.billItems.isEmpty ? null : () => _showBillGeneratedDialog(context, billProvider),
+              onPressed: billProvider.billItems.isEmpty
+                  ? null
+                  : () => _showBillGeneratedDialog(context, billProvider),
               icon: const Icon(Icons.receipt),
               label: const Text('Generate Bill'),
             ),
-          )
+          ),
         ],
       ),
-       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddMedicineDialog(context, medicineProvider, billProvider),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () =>
+            _showAddMedicineDialog(context, medicineProvider, billProvider),
         tooltip: 'Add Medicine to Bill',
         child: const Icon(Icons.add_shopping_cart),
       ),
     );
   }
 
-  void _showAddMedicineDialog(BuildContext context, MedicineProvider medicineProvider, BillProvider billProvider) {
+  void _showAddMedicineDialog(
+    BuildContext context,
+    MedicineProvider medicineProvider,
+    BillProvider billProvider,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
@@ -337,7 +408,7 @@ class _BillingScreenState extends State<BillingScreen> {
                 onChanged: (value) {
                   selectedMedicine = value;
                 },
-                 decoration: const InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Medicine',
                 ),
@@ -345,7 +416,10 @@ class _BillingScreenState extends State<BillingScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: quantityController,
-                decoration: const InputDecoration(labelText: 'Quantity', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Quantity',
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -357,12 +431,17 @@ class _BillingScreenState extends State<BillingScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (selectedMedicine != null && quantityController.text.isNotEmpty) {
+                if (selectedMedicine != null &&
+                    quantityController.text.isNotEmpty) {
                   final quantity = int.tryParse(quantityController.text);
                   if (quantity != null && quantity > 0) {
                     billProvider.addToBill(selectedMedicine!, quantity);
-                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${selectedMedicine!.name} added to bill.')),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '${selectedMedicine!.name} added to bill.',
+                        ),
+                      ),
                     );
                     Navigator.of(context).pop();
                   }
@@ -376,7 +455,10 @@ class _BillingScreenState extends State<BillingScreen> {
     );
   }
 
-  void _showBillGeneratedDialog(BuildContext context, BillProvider billProvider) {
+  void _showBillGeneratedDialog(
+    BuildContext context,
+    BillProvider billProvider,
+  ) {
     showDialog(
       context: context,
       builder: (context) {
@@ -387,7 +469,10 @@ class _BillingScreenState extends State<BillingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Total Amount:'),
-              Text('\$${billProvider.totalAmount.toStringAsFixed(2)}', style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                '\$${billProvider.totalAmount.toStringAsFixed(2)}',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
               const SizedBox(height: 16),
               const Text('Thank you for your purchase!'),
             ],
@@ -415,7 +500,7 @@ class InventoryScreen extends StatelessWidget {
     final medicineProvider = Provider.of<MedicineProvider>(context);
 
     return Scaffold(
-       body: medicineProvider.medicines.isEmpty
+      body: medicineProvider.medicines.isEmpty
           ? const Center(
               child: Text(
                 'No medicines in inventory. Add some to get started!',
@@ -423,36 +508,58 @@ class InventoryScreen extends StatelessWidget {
               ),
             )
           : ListView.builder(
-        itemCount: medicineProvider.medicines.length,
-        itemBuilder: (context, index) {
-          final medicine = medicineProvider.medicines[index];
-          return Card(
-             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: ListTile(
-              title: Text(medicine.name, style: Theme.of(context).textTheme.titleMedium),
-              subtitle: Text('Quantity: ${medicine.quantity}'),
-              trailing: Text(
-                '\$${medicine.price.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Theme.of(context).colorScheme.secondary),
-              ),
-              onTap: () => _showAddEditMedicineDialog(context, medicineProvider, medicine: medicine),
+              itemCount: medicineProvider.medicines.length,
+              itemBuilder: (context, index) {
+                final medicine = medicineProvider.medicines[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  child: ListTile(
+                    title: Text(
+                      medicine.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    subtitle: Text('Quantity: ${medicine.quantity}'),
+                    trailing: Text(
+                      '\$${medicine.price.toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
+                    onTap: () => _showAddEditMedicineDialog(
+                      context,
+                      medicineProvider,
+                      medicine: medicine,
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddEditMedicineDialog(context, medicineProvider),
-         tooltip: 'Add New Medicine',
+        tooltip: 'Add New Medicine',
         child: const Icon(Icons.add),
       ),
     );
   }
 
-    void _showAddEditMedicineDialog(BuildContext context, MedicineProvider medicineProvider, {Medicine? medicine}) {
+  void _showAddEditMedicineDialog(
+    BuildContext context,
+    MedicineProvider medicineProvider, {
+    Medicine? medicine,
+  }) {
     final isEditing = medicine != null;
-    final nameController = TextEditingController(text: isEditing ? medicine.name : '');
-    final priceController = TextEditingController(text: isEditing ? medicine.price.toString() : '');
-    final quantityController = TextEditingController(text: isEditing ? medicine.quantity.toString() : '');
+    final nameController = TextEditingController(
+      text: isEditing ? medicine.name : '',
+    );
+    final priceController = TextEditingController(
+      text: isEditing ? medicine.price.toString() : '',
+    );
+    final quantityController = TextEditingController(
+      text: isEditing ? medicine.quantity.toString() : '',
+    );
 
     showDialog(
       context: context,
@@ -464,18 +571,27 @@ class InventoryScreen extends StatelessWidget {
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: priceController,
-                decoration: const InputDecoration(labelText: 'Price', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Price',
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: quantityController,
-                decoration: const InputDecoration(labelText: 'Quantity', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Quantity',
+                  border: OutlineInputBorder(),
+                ),
                 keyboardType: TextInputType.number,
               ),
             ],
@@ -484,13 +600,16 @@ class InventoryScreen extends StatelessWidget {
             if (isEditing)
               TextButton(
                 onPressed: () {
-                   medicineProvider.deleteMedicine(medicine.id);
-                    ScaffoldMessenger.of(context).showSnackBar(
+                  medicineProvider.deleteMedicine(medicine.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('${medicine.name} deleted.')),
                   );
                   Navigator.of(context).pop();
                 },
-                child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -505,17 +624,27 @@ class InventoryScreen extends StatelessWidget {
                 if (name.isNotEmpty && price != null && quantity != null) {
                   if (isEditing) {
                     medicineProvider.updateMedicine(
-                      Medicine(id: medicine.id, name: name, price: price, quantity: quantity),
+                      Medicine(
+                        id: medicine.id,
+                        name: name,
+                        price: price,
+                        quantity: quantity,
+                      ),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('${medicine.name} updated.')),
                     );
                   } else {
-                     final newId = 'm${DateTime.now().millisecondsSinceEpoch}';
+                    final newId = 'm${DateTime.now().millisecondsSinceEpoch}';
                     medicineProvider.addMedicine(
-                      Medicine(id: newId, name: name, price: price, quantity: quantity),
+                      Medicine(
+                        id: newId,
+                        name: name,
+                        price: price,
+                        quantity: quantity,
+                      ),
                     );
-                     ScaffoldMessenger.of(context).showSnackBar(
+                    ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('$name added to inventory.')),
                     );
                   }

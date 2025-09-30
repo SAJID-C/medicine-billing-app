@@ -1,4 +1,3 @@
-
 # Blueprint: Medicine Billing Software
 
 ## Overview
@@ -31,10 +30,10 @@ A Flutter application for managing medicine inventory and generating bills for c
     - Add necessary dependencies like `provider` and `google_fonts`.
 2. **Create Data Models:**
     - Create a `Medicine` class to represent a medicine with properties like `id`, `name`, `price`, and `quantity`.
-    - Create a `CartItem` class to represent an item in the bill.
+    - Create a `BillItem` class to represent an item in the bill.
 3. **Implement State Management:**
     - Create a `MedicineProvider` to manage the medicine inventory.
-    - Create a `CartProvider` to manage the items in the bill.
+    - Create a `BillProvider` to manage the items in the bill.
 4. **Create UI:**
     - **Inventory Screen:**
         - A screen to display the list of medicines in the inventory.
